@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://watermarkpdf.vercel.app/</loc>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://watermarkpdf.vercel.app/protect</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://watermarkpdf.vercel.app/verify</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://watermarkpdf.vercel.app/blog</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://watermarkpdf.vercel.app/blog/how-to-invisible-watermark-pdf</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://watermarkpdf.vercel.app/blog/my-document-was-leaked</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>
