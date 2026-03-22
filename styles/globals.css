@@ -1,19 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════
+   GHOSTMARK DESIGN TOKENS
+   Every color must come from these variables.
+   Never use Tailwind color classes like bg-blue-500.
+═══════════════════════════════════════════════ */
+
 :root {
   /* Backgrounds */
-  --color-bg-primary:    #FBF7F0;  /* warm parchment — main page background */
-  --color-bg-secondary:  #FFFDF9;  /* off-white — cards, inputs */
-  --color-bg-surface:    #EDE5D8;  /* warm gray — nav pills, dividers */
+  --color-bg-primary:    #FBF7F0;
+  --color-bg-secondary:  #FFFDF9;
+  --color-bg-surface:    #EDE5D8;
 
-  /* Brand accent */
-  --color-accent:        #C4572A;  /* terracotta */
-  --color-accent-light:  #E8872A;  /* amber */
+  /* Brand accent — terracotta to amber */
+  --color-accent:        #C4572A;
+  --color-accent-light:  #E8872A;
   --gradient-accent:     linear-gradient(135deg, #C4572A 0%, #E8872A 100%);
 
   /* Text */
-  --color-text-primary:  #1C1309;  /* near-black warm */
-  --color-text-secondary:#7A6A58;  /* medium warm gray */
-  --color-text-muted:    #B0A090;  /* light warm gray */
-  --color-text-accent:   #C4572A;  /* terracotta links */
+  --color-text-primary:  #1C1309;
+  --color-text-secondary:#7A6A58;
+  --color-text-muted:    #B0A090;
+  --color-text-accent:   #C4572A;
 
   /* Borders */
   --color-border-light:  #EDE5D8;
@@ -28,32 +38,29 @@
   --color-danger:        #A8431C;
   --color-danger-bg:     #FDF0EA;
 
-  /* Border radius */
+  /* Radius */
   --radius-sm:   6px;
   --radius-md:   8px;
   --radius-lg:   12px;
   --radius-full: 9999px;
+
+  /* Fonts */
+  --font-ui:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono:  'Courier New', Courier, monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
+html, body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 16px;
+  font-family: var(--font-ui);
+  font-size: 13px;
   line-height: 1.6;
+  margin: 0;
+  padding: 0;
 }
 
-/* Noise texture — makes background feel like paper */
+/* Paper noise texture */
 .noise {
   position: fixed;
   inset: 0;
@@ -64,7 +71,7 @@ body {
   opacity: 0.5;
 }
 
-/* Ghost stamp grid — faint tiled background pattern */
+/* Ghost stamp grid — faint tiled background */
 .ghost-grid {
   position: absolute;
   inset: 0;
@@ -80,17 +87,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.1em;
-  color: #C4572A;
+  color: var(--color-accent);
   opacity: 0.05;
   transform: rotate(-18deg);
   white-space: nowrap;
 }
 
-/* Stamp animation keyframes */
+/* Loading animations */
 @keyframes stampDrop {
   0%   { transform: translateX(-50%) translateY(-20px); }
   65%  { transform: translateX(-50%) translateY(106px); }
@@ -110,44 +117,14 @@ body {
   100% { transform: translateX(-50%) scale(2.4); opacity: 0; }
 }
 
-a {
-  color: var(--color-text-accent);
-  text-decoration: none;
-  transition: opacity 0.2s ease;
+@keyframes lineLoad {
+  from { opacity: 0; width: 0; }
+  to   { opacity: 1; }
 }
 
-a:hover {
-  opacity: 0.8;
+.stamp-drop {
+  animation: stampDrop 0.38s cubic-bezier(0.36, 0, 0.66, -0.1) 0.6s both;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-input,
-textarea,
-select {
-  font-family: inherit;
-  font-size: 14px;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  transition: all 0.2s ease;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(196, 87, 42, 0.1);
-}
+.splash-in { animation: splashIn 0.12s ease-out forwards; }
+.ring-pop  { animation: ringPop  0.5s ease-out 1.05s both; }

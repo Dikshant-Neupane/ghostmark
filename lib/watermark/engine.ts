@@ -1,37 +1,36 @@
-// Main watermark function — runs all 3 layers in order
-
-import { PDFDocument } from 'pdf-lib';
-import { addWhiteTextLayer } from './whiteText';
-import { addUnicodeFingerprint } from './unicodeFingerprint';
-import { addMetadataLayer } from './metadata';
-import { generateWatermarkId } from '../utils/uuid';
+import { PDFDocument } from 'pdf-lib'
+import { addWhiteTextLayer } from './whiteText'
+import { addUnicodeFingerprint } from './unicodeFingerprint'
+import { addMetadataLayer } from './metadata'
+import { generateWatermarkId } from '../utils/uuid'
 
 export interface WatermarkConfig {
-  text: string;           // e.g. "CONFIDENTIAL"
-  recipientName: string;
-  recipientEmail: string;
+  text: string
+  recipientName: string
+  recipientEmail: string
 }
 
 export interface WatermarkResult {
-  pdfBytes: Uint8Array;   // the protected PDF — ready to download
-  watermarkId: string;    // unique ID — save this to database
+  pdfBytes: Uint8Array
+  watermarkId: string
 }
 
 export async function applyWatermark(
-  fileBuffer: ArrayBuffer,  // the original PDF from the user's file
+  fileBuffer: ArrayBuffer,
   config: WatermarkConfig
 ): Promise<WatermarkResult> {
+  const watermarkId = generateWatermarkId()
+  const pdfDoc = await PDFDocument.load(fileBuffer)
 
-  const watermarkId = generateWatermarkId();
+  // Layer 1 — white tiled text (note: watermarkId not passed — not needed here)
+  await addWhiteTextLayer(pdfDoc, config.text)
 
-  // Load the PDF — runs in browser, file never goes to server
-  const pdfDoc = await PDFDocument.load(fileBuffer);
+  // Layer 2 — zero-width unicode fingerprint
+  await addUnicodeFingerprint(pdfDoc, watermarkId)
 
-  // Run all 3 layers
-  await addWhiteTextLayer(pdfDoc, config.text, watermarkId);
-  await addUnicodeFingerprint(pdfDoc, watermarkId);
-  await addMetadataLayer(pdfDoc, config, watermarkId);
+  // Layer 3 — PDF metadata
+  await addMetadataLayer(pdfDoc, config, watermarkId)
 
-  const pdfBytes = await pdfDoc.save();
-  return { pdfBytes, watermarkId };
+  const pdfBytes = await pdfDoc.save()
+  return { pdfBytes, watermarkId }
 }

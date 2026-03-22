@@ -1,81 +1,57 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
+import Link from 'next/link'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 
 export default function Home() {
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Navbar */}
-      <nav style={{
-        padding: '20px 40px',
-        backgroundColor: 'var(--color-bg-secondary)',
-        borderBottom: '1px solid var(--color-border-light)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-          Ghost<span style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>Mark</span>
-        </div>
-        <div style={{ display: 'flex', gap: 20 }}>
-          <Link href="/protect">Protect</Link>
-          <Link href="/verify">Verify</Link>
-          <Link href="/blog">Blog</Link>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-        padding: '60px 40px',
-        maxWidth: '800px',
-        margin: '0 auto',
-      }}>
-        <h1 style={{
-          fontSize: 48,
-          fontWeight: 700,
-          marginBottom: 20,
-          color: 'var(--color-text-primary)',
+    <>
+      <Navbar />
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '60px 24px', maxWidth: 840, margin: '0 auto' }}>
+        
+        <div style={{ 
+          marginBottom: 24, padding: '6px 16px', borderRadius: 20, 
+          background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-medium)',
+          fontSize: 12, color: 'var(--color-text-secondary)'
         }}>
-          Invisible Watermark for PDF
+          Now with <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>V3 Architecture</span>
+        </div>
+
+        <h1 style={{ 
+          fontFamily: 'var(--font-serif)', fontSize: 56, lineHeight: 1.1, marginBottom: 24,
+          color: 'var(--color-text-primary)'
+        }}>
+          Invisible Watermarks for <br/>
+          <span style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>Confidential PDFs</span>
         </h1>
-        <p style={{
-          fontSize: 18,
-          color: 'var(--color-text-secondary)',
-          marginBottom: 40,
-          lineHeight: 1.8,
-        }}>
-          Add a watermark that stays <strong>hidden in PDFs</strong> but appears when converted to Word or Google Docs. Track who leaked your documents. Free forever.
-        </p>
-        <Link href="/protect">
-          <button style={{
-            background: 'var(--gradient-accent)',
-            color: 'white',
-            padding: '12px 32px',
-            fontSize: 16,
-            fontWeight: 600,
-            borderRadius: 'var(--radius-lg)',
-          }}>
-            Get Started →
-          </button>
-        </Link>
-      </section>
 
-      {/* Footer */}
-      <footer style={{
-        padding: '40px',
-        textAlign: 'center',
-        borderTop: '1px solid var(--color-border-light)',
-        color: 'var(--color-text-muted)',
-        fontSize: 14,
-      }}>
-        <p>GhostMark • Invisible Watermark PDF • Files never leave your browser</p>
-      </footer>
-    </main>
-  );
+        <p style={{ fontSize: 18, color: 'var(--color-text-secondary)', maxWidth: 540, lineHeight: 1.6, marginBottom: 48 }}>
+          Add a hidden tracking layer to your documents. Invisible in the PDF file, but instantly reveals the recipient&apos;s name when converted to Word or Google Docs.
+        </p>
+
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+          <Link href="/protect" style={{
+            padding: '14px 32px', borderRadius: 8,
+            background: 'var(--gradient-accent)',
+            color: '#fff', fontSize: 15, fontWeight: 600,
+            textDecoration: 'none',
+            boxShadow: '0 4px 14px rgba(196, 87, 42, 0.25)'
+          }}>
+            Protect a Document
+          </Link>
+          <Link href="/verify" style={{
+            padding: '14px 32px', borderRadius: 8,
+            background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-medium)',
+            color: 'var(--color-text-primary)', fontSize: 15, fontWeight: 500,
+            textDecoration: 'none'
+          }}>
+            Verify a Leak
+          </Link>
+        </div>
+
+      </main>
+      <Footer />
+    </>
+  )
 }

@@ -1,7 +1,7 @@
-import { PDFDocument, rgb } from 'pdf-lib'
+import { PDFDocument, PDFName, PDFString, PDFNumber, PDFArray, PDFDict } from 'pdf-lib'
 
-const ZERO = '\u0020'
-const ONE  = '\u00A0'
+const ZERO = '\u200B'
+const ONE  = '\u200C'
 
 function encodeId(id: string): string {
   return id
@@ -18,18 +18,37 @@ export async function addUnicodeFingerprint(
   watermarkId: string
 ): Promise<void> {
   const encoded = encodeId(watermarkId)
-  const pages = pdfDoc.getPages()
-  const firstPage = pages[0]
-  const font = await pdfDoc.embedFont('Helvetica' as Parameters<typeof pdfDoc.embedFont>[0])
+  const firstPage = pdfDoc.getPages()[0]
 
-  firstPage.drawText(encoded, {
-    x: 0,
-    y: 0,
-    size: 0.1,
-    font,
-    color: rgb(1, 1, 1),
-    opacity: 0,
+  // Store as a hidden annotation — no font encoding, no crash
+  const annotation = pdfDoc.context.obj({
+    Type:     PDFName.of('Annot'),
+    Subtype:  PDFName.of('Text'),
+    Rect:     [0, 0, 0, 0],
+    Contents: PDFString.of(encoded),
+    F:        PDFNumber.of(2),
+    NM:       PDFString.of(`ghostmark-${watermarkId}`),
   })
+
+  const annotRef = pdfDoc.context.register(annotation)
+  const pageDict = firstPage.node
+  const annotsKey = PDFName.of('Annots')
+  const existing = pageDict.lookupMaybe(annotsKey, PDFArray)
+
+  if (existing) {
+    existing.push(annotRef)
+  } else {
+    pageDict.set(annotsKey, pdfDoc.context.obj([annotRef]))
+  }
+
+  // Also write plain UUID to custom metadata field as fallback for Verify
+  const infoRef = pdfDoc.context.trailerInfo.Info
+  if (infoRef) {
+    const infoDict = pdfDoc.context.lookup(infoRef, PDFDict)
+    if (infoDict) {
+      infoDict.set(PDFName.of('GhostMarkID'), PDFString.of(watermarkId))
+    }
+  }
 }
 
 export function decodeFingerprint(text: string): string | null {
@@ -38,7 +57,7 @@ export function decodeFingerprint(text: string): string | null {
     .filter(c => c === ZERO || c === ONE)
     .join('')
 
-  if (hidden.length === 0) return null
+  if (hidden.length < 8) return null
 
   const binary = hidden.split('').map(c => c === ZERO ? '0' : '1').join('')
   const chars: string[] = []
