@@ -1,248 +1,152 @@
-'use client';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 
-import { useParams } from 'next/navigation';
+interface Post {
+  title: string
+  date: string
+  content: string
+}
 
-const blogPosts: { [key: string]: { title: string; content: string } } = {
+const POSTS: Record<string, Post> = {
   'how-to-invisible-watermark-pdf': {
-    title: 'How to Watermark PDF with Invisible Text',
+    title: 'How to Add an Invisible Watermark to a PDF (That Shows in Word & Google Docs)',
+    date: '2025-03-22',
     content: `
-      # How to Watermark PDF with Invisible Text
+Protecting confidential documents is harder than it sounds. A visible watermark can be cropped or removed.
+But an invisible watermark — one that only appears after conversion — is a completely different level of protection.
 
-      ## The Problem
+## What is an invisible watermark?
 
-      If you send a PDF to someone and they leak it, how do you prove who leaked it?
+An invisible watermark is text hidden inside a PDF in white color. Because the background is also white,
+the text is completely invisible. But when a PDF-to-Word converter processes the file, it strips all text colors
+and defaults everything to black. The hidden text suddenly appears across every page.
 
-      Traditional watermarks are visible on the document, so:
-      - They make the document look unprofessional
-      - They can be easily removed
-      - Forwarding a PDF with a visible watermark to someone else reveals the person who received it
+## How GhostMark works
 
-      ## The Solution: Invisible Watermarks
+GhostMark uses three layers simultaneously:
 
-      GhostMark uses three layers of watermarking that are completely invisible in PDFs:
+1. White tiled text — stamped across every page in a 4×5 grid, rotated -18 degrees
+2. Zero-width Unicode characters — woven into the text stream, survive any format conversion
+3. PDF metadata — watermark ID embedded in Author and Keywords fields
 
-      ### Layer 1: White Text Grid
-      Every page gets 20 copies of your watermark text (in a 4×5 grid) printed in WHITE color.
-      Since white on white is invisible, you can't see it in the PDF.
+## Step by step
 
-      But when you convert the PDF to Google Docs, Word, or any other format, the text colors get converted to black.
-      Suddenly, the watermark appears everywhere.
+1. Go to watermarkpdf.vercel.app/protect
+2. Upload your PDF (up to 25 MB)
+3. Type your watermark message
+4. Enter the recipient's name and email
+5. Click "Generate protected document"
+6. Download the protected PDF — it looks completely normal
 
-      ### Layer 2: Unicode Fingerprints
-      The unique watermark ID is encoded as invisible zero-width Unicode characters (U+200B and U+200C).
-      These characters have zero width and are completely invisible to humans.
+## What happens when someone converts it?
 
-      They're hidden between regular words in the PDF text.
-      When someone copy-pastes text from the document, these characters come along with it.
-      Even if they convert it to Google Docs or edit it in Word, the fingerprint survives.
+Word and Google Docs strip text colors during PDF conversion.
+The white watermark text becomes black and appears tiled across every page.
 
-      ### Layer 3: Metadata
-      The watermark ID and recipient information are also stored in the PDF's metadata fields.
-      Anyone can view this by opening File → Properties in any PDF reader.
+## Catching a leak
 
-      ## How to Use GhostMark
-
-      1. Go to the Protect tab
-      2. Upload your PDF
-      3. Enter your watermark text (e.g., "CONFIDENTIAL")
-      4. Enter the recipient's name and email
-      5. Click "Generate Protected Document"
-      6. Download the protected PDF
-      7. Send it to your recipient
-
-      That's it. The watermark is now embedded in three ways.
-
-      ## If Your Document Leaks
-
-      1. Go to the Verify tab
-      2. Upload the leaked document (PDF, Word, or converted version)
-      3. GhostMark extracts the watermark ID
-      4. It tells you who the document was sent to
-
-      ## Why This Works
-
-      **White text layer** = Works when converted to Word, Google Docs, or any format
-      **Unicode fingerprints** = Survives copy-paste and format conversion
-      **Metadata** = Provides another layer of tracking
-
-      All three layers together make it nearly impossible to leak a document without leaving a trail.
-
-      ## Privacy
-
-      GhostMark processes your PDF entirely in your browser.
-      Your file is never uploaded to our servers.
-      Only the watermark ID + recipient info is sent to our database.
+If the document appears online or is forwarded, upload it to the Verify tab.
+GhostMark extracts the hidden watermark ID and tells you exactly who received the original copy.
     `,
   },
   'my-document-was-leaked': {
-    title: 'My Document Was Leaked - What Now?',
+    title: 'My Confidential Document Was Leaked — How to Find Out Who Did It',
+    date: '2025-03-22',
     content: `
-      # My Document Was Leaked - What Now?
+Discovering that a confidential document has been leaked is alarming.
+But if you used GhostMark before sending it, you already have everything you need to trace it.
 
-      Don't panic. If you watermarked your document with GhostMark, you can find out exactly who leaked it.
+## How document fingerprinting works
 
-      ## Step 1: Get the Leaked Document
+When you protect a document with GhostMark, a unique ID is embedded invisibly in three ways:
+- As zero-width characters in the text stream
+- As white tiled text that appears after conversion
+- In the PDF metadata fields
 
-      Someone sent you (or you found) a document that's yours.
-      It could be:
-      - A PDF
-      - A Word document (.docx)
-      - A Google Docs link
-      - A text file (.txt)
-      - Anything they converted it to
+Each recipient gets a different copy with a unique ID linked to their name and email.
 
-      ## Step 2: Go to Verify
+## Tracing the leak
 
-      1. Visit watermarkpdf.vercel.app/verify
-      2. Upload the leaked document
-      3. Click "Check Document"
+1. Go to watermarkpdf.vercel.app/verify
+2. Upload the leaked document
+3. GhostMark extracts the hidden ID
+4. The registry returns: recipient name, email, date the document was sent
 
-      ## Step 3: Get the Results
+## What if the watermark was removed?
 
-      If you watermarked it with GhostMark, you'll see:
-      - The recipient's name
-      - The recipient's email address
-      - The watermark text you used
-      - The date you sent it
-      - The original filename
+The Unicode fingerprint layer is extremely resilient. It survives:
+- PDF to Word conversion
+- Copy and paste of text
+- Most editing tools
 
-      ## Step 4: Take Action
+Only the white text layer is removed if someone converts and re-exports cleanly.
+But the Unicode and metadata layers remain.
 
-      Now you know exactly who you sent it to. You can:
-      - Contact them and ask why they leaked it
-      - Take legal action if necessary
-      - Update your security practices
-      - Track which documents they're sharing
+## Best practice
 
-      ## Why Watermarks Stick
-
-      The watermark ID survives even if someone:
-      - Converts PDF to Word
-      - Uploads to Google Docs
-      - Copies text and pastes into a new document
-      - Prints and scans the document (the white text layer appears)
-      - Runs through OCR
-      - Takes screenshots (metadata remains)
-
-      The invisibility is key — the leaker doesn't even know the watermark is there.
-
-      ## Privacy & Your Data
-
-      When you verify a leaked document, only the watermark ID is sent to our servers.
-      We don't store the document itself.
-      We don't track who verified what.
-
-      The watermark ID is anonymized and expires after 90 days, so your data doesn't stay in our database forever.
-
-      ## Questions?
-
-      - **How long does the watermark stay?** 90 days. After that, the ID expires from our database.
-      - **Can they remove the watermark?** The white text layer is hard to remove (it appears when converted). The Unicode fingerprints survive copy-paste. The metadata can be stripped, but the other two layers remain.
-      - **What if they print and scan?** The white text becomes visible and the watermark appears. Perfect proof.
-      - **Is my document safe?** Yes. The file never goes to our servers. Only the encrypted watermark ID.
+Always use per-recipient fingerprinting — a unique watermark ID for every person you send to.
+This turns every copy into a unique evidence trail.
     `,
   },
-};
+}
 
-export default function BlogPost() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const post = blogPosts[slug];
+interface PageProps {
+  params: { slug: string }
+}
+
+export default function BlogPostPage({ params }: PageProps) {
+  const post = POSTS[params.slug]
 
   if (!post) {
-    return (
-      <main style={{ minHeight: '100vh', padding: '40px 20px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{
-            fontSize: 32,
-            fontWeight: 700,
-            color: 'var(--color-text-primary)',
-          }}>
-            Post Not Found
-          </h1>
-          <p style={{ color: 'var(--color-text-secondary)', marginTop: 20 }}>
-            The blog post you&apos;re looking for doesn&apos;t exist.
-          </p>
-        </div>
-      </main>
-    );
+    notFound()
   }
 
   return (
-    <main style={{ minHeight: '100vh', padding: '40px 20px' }}>
-      <article style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{
-          fontSize: 40,
-          fontWeight: 700,
-          marginBottom: 30,
-          color: 'var(--color-text-primary)',
-        }}>
+    <>
+      <Navbar />
+      <main style={{ maxWidth: 720, margin: '0 auto', padding: '48px 24px', flex: 1 }}>
+        {/* FIX: Use Link not <a> for internal navigation */}
+        <Link
+          href="/blog"
+          style={{ fontSize: 12, color: 'var(--color-accent)', textDecoration: 'none', display: 'inline-block', marginBottom: 32 }}
+        >
+          ← Back to blog
+        </Link>
+
+        <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 8 }}>{post.date}</p>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 'normal', marginBottom: 32, lineHeight: 1.3 }}>
           {post.title}
         </h1>
 
-        <div style={{
-          color: 'var(--color-text-primary)',
-          lineHeight: 1.8,
-          fontSize: 16,
-        }}>
-          {post.content.split('\n').map((line, i) => {
-            if (line.startsWith('# ')) {
-              return (
-                <h2 key={i} style={{
-                  fontSize: 28,
-                  fontWeight: 700,
-                  marginTop: 30,
-                  marginBottom: 20,
-                  color: 'var(--color-text-primary)',
-                }}>
-                  {line.replace('# ', '')}
-                </h2>
-              );
-            } else if (line.startsWith('## ')) {
-              return (
-                <h3 key={i} style={{
-                  fontSize: 20,
-                  fontWeight: 600,
-                  marginTop: 24,
-                  marginBottom: 12,
-                  color: 'var(--color-text-primary)',
-                }}>
-                  {line.replace('## ', '')}
-                </h3>
-              );
-            } else if (line.startsWith('- ')) {
-              return (
-                <li key={i} style={{ marginLeft: 20, marginBottom: 8 }}>
-                  {line.replace('- ', '')}
-                </li>
-              );
-            } else if (line.trim() === '') {
-              return <div key={i} style={{ height: 16 }} />;
-            } else if (line.trim()) {
-              return (
-                <p key={i} style={{ marginBottom: 16, color: 'var(--color-text-primary)' }}>
-                  {line}
-                </p>
-              );
-            }
-            return null;
-          })}
+        <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+          {post.content}
         </div>
 
-        <div style={{
-          marginTop: 40,
-          paddingTop: 20,
-          borderTop: '1px solid var(--color-border-light)',
-        }}>
-          <a href="/blog" style={{
-            color: 'var(--color-accent)',
-            fontWeight: 500,
-            textDecoration: 'underline',
-          }}>
-            ← Back to Blog
-          </a>
+        <div style={{ marginTop: 48, padding: 24, background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: 12 }}>
+          <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Try GhostMark free</p>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 16 }}>
+            Protect your next document with an invisible watermark in under 60 seconds.
+          </p>
+          <Link
+            href="/protect"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              background: 'var(--gradient-accent)',
+              color: '#fff',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
+          >
+            Protect a document →
+          </Link>
         </div>
-      </article>
-    </main>
-  );
+      </main>
+      <Footer />
+    </>
+  )
 }
