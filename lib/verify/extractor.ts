@@ -6,10 +6,19 @@ export interface ExtractionResult {
 }
 
 function extractFromMetadata(text: string): string | null {
-  const match = text.match(
+  // Pattern 1: "id:{uuid}" — written by metadata.ts into Keywords
+  const match1 = text.match(
     /id:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/i
   )
-  return match ? match[1] : null
+  if (match1) return match1[1]
+
+  // Pattern 2: "GhostMarkID:{uuid}" — written by unicodeFingerprint.ts
+  const match2 = text.match(
+    /GhostMarkID[:\s]+([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/i
+  )
+  if (match2) return match2[1]
+
+  return null
 }
 
 export function extractFromText(rawText: string): ExtractionResult {
